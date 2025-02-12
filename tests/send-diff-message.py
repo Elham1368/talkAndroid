@@ -1,5 +1,5 @@
 import time
-from wsgiref.validate import assert_
+# from wsgiref.validate import assert_
 
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
@@ -319,7 +319,7 @@ class TestLogin:
 
         group_name= 'گروه قدیم خودم😐😐😐'
         # Use UiScrollable to scroll until the group thread is found
-        scrollable_thread_list = 'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().descriptionContains("{}"))'.format(group_name)
+        scrollable_thread_list = 'new UiScrollable(new UiSelector().resourceId("android:id/content")).scrollIntoView(new UiSelector().descriptionContains("{}"))'.format(group_name)
         # Execute scrolling command
         driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value=scrollable_thread_list)
         group_thread = driver.find_element(
