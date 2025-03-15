@@ -1,10 +1,7 @@
 import time
-from logging import fatal
-from os import times
 
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
-from appium.options.common.base import APPIUM_PREFIX
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -393,6 +390,8 @@ class TestCreateGroupThread:
         assert back_to_thread_list.is_displayed(),'back to thread list find'
         back_to_thread_list.click()
 
+        driver.background_app(7)
+
         #check the new group is displaying in thread list
         time.sleep(3)
         scrollable_container = driver.find_element(
@@ -427,37 +426,37 @@ class TestCreateGroupThread:
         if attempts == max_attempts:
             print("Element not found after maximum scroll attempts.")
 
-    # @it("delete the new group history")
-    # def test_delete_new_group(self,driver):
-    #     time.sleep(3)
-    #     #click header for opening thread info
-    #     history_header = driver.find_element(
-    #         by = AppiumBy.XPATH,
-    #         value= '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View/android.view.View[4]/android.view.View[2]'
-    #     )
-    #     assert history_header.is_displayed(),'history header find'
-    #     history_header.click()
-    #
-    #     #click on ... to find delete group
-    #     more_icon = driver.find_element(
-    #         by = AppiumBy.XPATH,
-    #         value= '//android.widget.ImageView[@content-desc="Cam"]'
-    #     )
-    #     assert more_icon.is_displayed(),'delete contact icon find'
-    #     more_icon.click()
-    #
-    #     #select delete group
-    #     delete_group = driver.find_element(
-    #         by= AppiumBy.XPATH,
-    #         value= '//android.widget.TextView[@text="حذف گروه"]'
-    #     )
-    #     assert delete_group.is_displayed(), ' delete group find'
-    #     delete_group.click()
-    #
-    #     #confirm delete group
-    #     confirm_delete_group = driver.find_element(
-    #         by = AppiumBy.XPATH,
-    #         value= '//android.widget.TextView[@text="حذف"]'
-    #     )
-    #     assert confirm_delete_group.is_displayed(), ' delete group find'
-    #     confirm_delete_group.click()
+    @it("delete the new group history")
+    def test_delete_new_group(self,driver):
+        time.sleep(3)
+        #click header for opening thread info
+        history_header = driver.find_element(
+            by = AppiumBy.XPATH,
+            value= '//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View/android.view.View[4]/android.view.View[2]'
+        )
+        assert history_header.is_displayed(),'history header find'
+        history_header.click()
+
+        #click on ... to find delete group
+        more_icon = driver.find_element(
+            by = AppiumBy.XPATH,
+            value= '//android.widget.ImageView[@content-desc="Cam"]'
+        )
+        assert more_icon.is_displayed(),'delete contact icon find'
+        more_icon.click()
+
+        #select delete group
+        delete_group = driver.find_element(
+            by= AppiumBy.XPATH,
+            value= '//android.widget.TextView[@text="حذف گروه"]'
+        )
+        assert delete_group.is_displayed(), ' delete group find'
+        delete_group.click()
+
+        #confirm delete group
+        confirm_delete_group = driver.find_element(
+            by = AppiumBy.XPATH,
+            value= '//android.widget.TextView[@text="حذف"]'
+        )
+        assert confirm_delete_group.is_displayed(), ' delete group find'
+        confirm_delete_group.click()
