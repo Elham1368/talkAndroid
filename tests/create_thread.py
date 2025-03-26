@@ -2,13 +2,13 @@ import time
 
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
-from appium.options.common.base import APPIUM_PREFIX
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pytest
 # Custom describe and it functions
 def describe(description):
+
     def decorator(cls):
         cls.__description__ = description
         return cls
@@ -29,7 +29,7 @@ def driver():
         "deviceName": "Galaxy A52",
         "appium:appPackage": "ir.dotin.talk",
         "appium:appActivity": "ir.dotin.talk.presentation.main.MainActivity",
-        "appium:newCommandTimeout": 120000,
+        "appium:newCommandTimeout": 600000,
         "appium:noReset": True,
 
         # "app":apk_path,
@@ -319,7 +319,7 @@ class TestCreateGroupThread:
     @it("click menu and create new group")
     def test_click_menu_create_new_group(self,driver):
         time.sleep(5)
-
+        print("Script is running!")
         #click on menu
         toggle_menu = driver.find_element(
             by=AppiumBy.XPATH,
