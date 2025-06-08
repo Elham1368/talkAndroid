@@ -43,7 +43,7 @@ class SendMessageActions:
         if attempts == max_attempts:
             print("Element not found after maximum scroll attempts.")
 
-    def find_child_text_with_scroll(self, message_text,max_swipes=10, retry_on_top=True):
+    def find_child_text_with_scroll(self, message_text,max_swipes=3, retry_on_top=True):
         time.sleep(5)
 
         #داخل المنت scrollable اسکرول کن و به دنبال TextView با متن خاص بگرد
@@ -62,10 +62,10 @@ class SendMessageActions:
             start_y = location['y'] + size['height'] * 0.8  # پایین صفحه
             end_y = location['y'] + size['height'] * 0.2    # بالای صفحه
 
-            found = False
+            # found = False
             scrolled_once = False
 
-            while not found:
+            while True:
                 for i in range(max_swipes):
                     try:
                         # 2. به دنبال TextView با متن مورد نظر بگرد
@@ -74,7 +74,6 @@ class SendMessageActions:
                             value=f'//android.widget.TextView[@text="{message_text}"]'
                         )
                         time.sleep(5)
-                        element.click()
                         return element
                     except NoSuchElementException:
                         # 3. اگر پیدا نشد، swipe کن
@@ -90,32 +89,95 @@ class SendMessageActions:
                     scrolled_once = False
                     retry_on_top = False  # فقط یکبار به بالا برگرد
                 else:
-                    return False
+                    # 📌 اگر پیام پیدا نشد، متن رو ارسال کن
+                    print("⚠️ پیام پیدا نشد. در حال ارسال پیام...")
+                    return None
 
         except NoSuchElementException as e:
             print("❌ المنت scrollable پیدا نشد! لطفاً xpath صحیح را چک کنید.")
+            return None
+    # def edit(self, action_name,origin_message,edit_message_text):
+    #
+    #     time.sleep(3)
+    #     click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{action_name}"]')
+    #     send_keys_to_element(self.driver,AppiumBy.XPATH,f'//android.widget.EditText[@text="{origin_message}"]',f'{edit_message_text}')
+    #     click_element(self.driver,AppiumBy.XPATH,'//android.view.View[@content-desc="send"]')
 
-    def edit(self, action_name,origin_message,edit_message_text):
-        time.sleep(3)
-        click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{action_name}"]')
-        send_keys_to_element(self.driver,AppiumBy.XPATH,f'//android.widget.EditText[@text="{origin_message}"]',f'{edit_message_text}')
-        click_element(self.driver,AppiumBy.XPATH,'//android.view.View[@content-desc="send"]')
+    def edit(self, action_name, origin_message, edit_message_text):
+        time.sleep(2)
 
-    def delete_for_me(self,edit_message_text,action_name,delete_for_all,delete_for_me,confirm):
-        self.find_child_text_with_scroll(edit_message_text,15)
-        if action_name:
-            click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{action_name}"]')
+        # اول بررسی کن پیام موجود هست یا نه (بدون کلیک)
+        message_element = self.find_child_text_with_scroll(origin_message)
+
+        if message_element:
+            try:
+                # حالا روش کلیک کن تا بتونی Action name رو ببینی
+                message_element.click()
+                time.sleep(1)
+
+                # تلاش برای پیدا کردن Action name
+                click_element(self.driver, AppiumBy.XPATH, f'//android.widget.TextView[@text="{action_name}"]')
+
+            except NoSuchElementException:
+                # پیام بود ولی Action name پیدا نشد → باید پیام جدید بفرستی
+                print("⚠️ پیام پیدا شد ولی Action name موجود نیست. ارسال پیام جدید...")
+                send_keys_to_element(self.driver,AppiumBy.XPATH,'//android.widget.EditText[@text="اینجا بنویسید…"]',origin_message)
+                click_element(self.driver, AppiumBy.XPATH, '//android.view.View[@content-desc="send"]')
+                time.sleep(2)
+
+                # دوباره تلاش کن
+                self.edit(action_name, origin_message, edit_message_text)
+                return
+
         else:
-            print("message is not editable")
+            # پیام پیدا نشد → ارسال پیام جدید
+            print("🔴 پیام پیدا نشد. ارسال پیام جدید...")
+            send_keys_to_element(self.driver,AppiumBy.XPATH,'//android.widget.EditText[@text="اینجا بنویسید…"]',origin_message)
+            click_element(self.driver, AppiumBy.XPATH, '//android.view.View[@content-desc="send"]')
+            time.sleep(2)
 
-        if delete_for_all:
-            click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{delete_for_all}"]')
-            click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{confirm}"]')
+            # دوباره تلاش کن برای ویرایش
+            self.edit(action_name, origin_message, edit_message_text)
+            return
+
+        # ✅ اگر به اینجا رسیدی یعنی پیام هست و Action name هم پیدا شده
+        print("✏️ در حال ویرایش پیام...")
+        send_keys_to_element( self.driver,AppiumBy.XPATH,f'//android.widget.EditText[@text="{origin_message}"]',edit_message_text)
+        click_element(self.driver, AppiumBy.XPATH, '//android.view.View[@content-desc="send"]')
+
+
+    def delete(self,edit_message_text,action_name,delete_for_all,delete_for_me,confirm):
+        message_element = self.find_child_text_with_scroll(edit_message_text)
+        if message_element:
+            message_element.click()
+            if action_name:
+                click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{action_name}"]')
+            else:
+                print("message is not editable")
+
+            if delete_for_all:
+                click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{delete_for_all}"]')
+                click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{confirm}"]')
+            else:
+                click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{delete_for_me}"]')
+                click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{confirm}"]')
         else:
-            click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{delete_for_me}"]')
-            click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{confirm}"]')
+            send_keys_to_element(self.driver,AppiumBy.XPATH,'//android.widget.EditText[@text="اینجا بنویسید…"]',edit_message_text)
+            click_element(self.driver, AppiumBy.XPATH, '//android.view.View[@content-desc="send"]')
+            self.delete(edit_message_text,action_name,delete_for_all,delete_for_me,confirm)
 
 
-    # def forward(self):
+    def forward(self,message,action_name):
+        message_element = self.find_child_text_with_scroll(message)
+        if message_element:
+            message_element.click()
+            if action_name:
+                click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{action_name}"]')
+            else:
+                print("message is not editable")
+        else:
+            send_keys_to_element(self.driver,AppiumBy.XPATH,'//android.widget.EditText[@text="اینجا بنویسید…"]',message)
+            click_element(self.driver, AppiumBy.XPATH, '//android.view.View[@content-desc="send"]')
+            self.forward(message,action_name)
     # def copy(self):
     # def select(self):

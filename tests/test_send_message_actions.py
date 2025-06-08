@@ -86,10 +86,10 @@ class TestMessageActions:
     def test_actions_send_messages(self, driver):
         send_message_actions = SendMessageActions(driver)
         send_message_actions.open_single_thread("الهام test")
-        send_message_actions.find_child_text_with_scroll("این یک پیام تستی برای اتومیشن اندروید است")
+        # send_message_actions.find_child_text_with_scroll("این یک پیام تستی برای اتومیشن اندروید است")
         # send_message_actions.open_context_menu()
         send_message_actions.edit("ویرایش",'این یک پیام تستی برای اتومیشن اندروید است',"پیام برای ویرایش پیام اصلی در اتومیشن اندروید هست")
-        send_message_actions.delete_for_me("پیام برای ویرایش پیام اصلی در اتومیشن اندروید هست",'حذف','برای من و دیگران','فقط برای من','تایید')
-        # send_message_actions.forward()
+        send_message_actions.delete("پیام برای ویرایش پیام اصلی در اتومیشن اندروید هست",'حذف','برای من و دیگران','فقط برای من','تایید')
+        send_message_actions.forward("پیام برای ویرایش پیام اصلی در اتومیشن اندروید هست","ارسال")
         # send_message_actions.copy()
         # send_message_actions.select()
