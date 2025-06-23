@@ -43,7 +43,7 @@ class SendMessageActions:
         if attempts == max_attempts:
             print("Element not found after maximum scroll attempts.")
 
-    def find_child_text_with_scroll(self, message_text,max_swipes=3, retry_on_top=True):
+    def find_child_text_with_scroll(self, message_text,max_swipes=1, retry_on_top=True):
         time.sleep(5)
 
         #داخل المنت scrollable اسکرول کن و به دنبال TextView با متن خاص بگرد
@@ -173,11 +173,25 @@ class SendMessageActions:
             message_element.click()
             if action_name:
                 click_element(self.driver,AppiumBy.XPATH,f'//android.widget.TextView[@text="{action_name}"]')
+                #کلیک روی آیکن سرچ برای پیدا کردن ترد موردنظر برای انجام اکشن فوروارد
+                click_element(self.driver,AppiumBy.XPATH,'//android.view.View[@content-desc="Search"]')
+                send_keys_to_element(self.driver,AppiumBy.XPATH,'//android.widget.EditText','گروه قدیم خودم')
+                click_element(self.driver,AppiumBy.XPATH,'//android.widget.TextView[@text="گروه قدیم خودم"]')
+                click_element(self.driver,AppiumBy.XPATH,'//android.view.View[@content-desc="send"]')
+                self.find_child_text_with_scroll(message)
+
+
             else:
-                print("message is not editable")
+                print("message can not forward")
         else:
             send_keys_to_element(self.driver,AppiumBy.XPATH,'//android.widget.EditText[@text="اینجا بنویسید…"]',message)
             click_element(self.driver, AppiumBy.XPATH, '//android.view.View[@content-desc="send"]')
             self.forward(message,action_name)
+
     # def copy(self):
     # def select(self):
+
+    # def reply_private(self,message,action_name,):
+        #find message
+        self.find_child_text_with_scroll('test')
+        #check the message is not mine to make it possible for reply private
